@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../vender/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../vender/css/fontawesome-free/css/all.min.css">
+    <style>
+        .main-content {}
+
+        .block {
+            display: inline-block;
+            width: 50px;
+            aspect-ratio: 1 / 1;
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        .block.non {
+            border-color: white;
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container d-flex justify-content-center align-items-center">
+            <a href="../index.html" class="navbar-brand border border-dark rounded-2 p-2 mb-2">Menu Game Puzzle</a>
+        </div>
+    </nav>
+    <div class="container">
+        <a href="../index.html" class="text-dark fs-1"><i class="fas fa-home"></i></a>
+        <span class="fs-5">Trở về trang chủ</span>
+
+        <div class="row row-cols-2 d-flex justify-content-center align-items-center m-4">
+            <div class="col-auto">
+                <label class="col-form-label">Mức độ trò chơi</label>
+            </div>
+            <div class="col-auto">
+                <select class="form-select" aria-label="Default select example" id="sizeSelect">
+                    <option selected>Chọn kích thước</option>
+                </select>
+            </div>
+        </div>
+
+        
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="main-content border border-dark rounded-2 p-2">
+                <div class="block m-1 align-content-center">1</div>
+                <div class="block m-1 align-content-center">1</div>
+                <div class="block m-1 align-content-center">1</div>
+                <br>
+                <div class="block m-1 align-content-center">1</div>
+                <div class="block m-1 align-content-center">1</div>
+                <div class="block m-1 align-content-center">1</div>
+                <br>
+                <div class="block m-1 align-content-center">1</div>
+                <div class="block m-1 align-content-center">1</div>
+                <div class="block m-1 align-content-center">1</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const minOption = 3;
+        const maxOption = 7;
+        let select = document.getElementById("sizeSelect");
+        for (let i = minOption; i <= maxOption; i++) {
+            let option = document.createElement("option");
+            option.value = i;
+            option.textContent = `${i} x ${i}`;
+            select.appendChild(option);
+        }
+    </script>
+
+    <script src="../vender/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
