@@ -4,8 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sudoku</title>
+    <style>
+        .cell{
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            display: inline-block;
+            text-align: center;
+            line-height: 50px;
+            user-select: none;
+        }
+        .cell:hover{
+            background-color: #C0C0C0;
+        }
+        .cell2{
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            display: inline-block;
+            text-align: center;
+            line-height: 50px;
+            user-select: none;
+            background-color: #C0C0C0;
+        }
+        .cell2:hover{
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
-    
+    <main>
+        <pre id="Sudoku"></pre>
+        <script>
+            var result = '';
+            for(let i = 0; i < 9; i++){
+                for(let j = 0; j < 9;j++){
+                    if((j>2 && j<6)&&i<3 || (j>2 && j<6)&&i>5 || (i>2 && i<6)&&j<3 || (i>2 && i<6)&&j>5){
+                        result += `<div class="cell" id="cell-${i}-${j}" onclick="cellClick(${i},${j})">${0}</div>`;
+                    }else{
+                        result += `<div class="cell2" id="cell-${i}-${j}" onclick="cellClick(${i},${j})">${0}</div>`;
+                    }
+                }
+                result += '<br>';
+            }
+            document.getElementById('Sudoku').innerHTML = result;
+
+            function cellClick(i,j){
+                let cell = document.getElementById(`cell-${i}-${j}`);
+                let value = parseInt(cell.innerHTML);
+                if(value < 9){
+                    cell.innerHTML = value + 1;
+                }else{
+                    cell.innerHTML = 0;
+                }
+            }
+        </script>
+    </main>
 </body>
 </html>
