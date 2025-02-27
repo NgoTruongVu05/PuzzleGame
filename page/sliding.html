@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="../vender/css/bootstrap.min.css">
     <link rel="stylesheet" href="../vender/css/fontawesome-free/css/all.min.css">
     <style>
-        .main-content {}
-
         .block {
             display: inline-block;
             width: 50px;
@@ -36,7 +34,7 @@
             <i class="fas fa-home"></i>
             <span class="fs-5">Trở về trang chủ</span>
         </a>
-        
+
 
         <div class="row row-cols-2 d-flex justify-content-center align-items-center m-4">
             <div class="col-auto">
@@ -45,14 +43,18 @@
             <div class="col-auto">
                 <select class="form-select" aria-label="Default select example" id="levelSelect"
                     onchange="setGame(levelSelect.value)">
-                    <option selected>Chọn mức độ</option>
+                    <option selected value="0">Chọn mức độ</option>
                 </select>
             </div>
         </div>
 
 
-        <div class="d-flex justify-content-center align-items-center">
-            <div class="main-content border border-dark rounded-2 p-2">
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <div class="card d-none" id="quantityCard">
+                <div class="card-header">Số lần di chuyển</div>
+                <div class="card-body text-center" id="quantity">0</div>
+            </div>
+            <div class="main-content">
             </div>
         </div>
     </div>
@@ -67,7 +69,8 @@
                     <p>Chơi tiếp không?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnDismiss">Không</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        id="btnDismiss">Không</button>
                     <button type="button" class="btn btn-primary" id="btnAgree">Chơi</button>
                 </div>
             </div>
@@ -85,14 +88,38 @@
             select.appendChild(option);
         }
 
+        document.getElementById("levelSelect").addEventListener("change", function () {
+            setTimeout(() => this.blur(), 100);
+        });
 
         const mainContent = document.querySelector('.main-content');
+        var count = 0;
+        var quantity = document.getElementById("quantity");
+        var quantityCard = document.getElementById("quantityCard");
 
         function setGame(level) {
+            if (level >= minOption) {
+                if (quantityCard.classList.contains("d-none")) {
+                    quantityCard.classList.remove("d-none");
+                }
+                if (!mainContent.classList.contains("border")) {
+                    mainContent.classList.add("border", "border-dark", "rounded-2", "p-2");
+                }
+            } else {
+                if (!quantityCard.classList.contains("d-none")) {
+                    quantityCard.classList.add("d-none");
+                }
+                if (mainContent.classList.contains("border")) {
+                    mainContent.classList.remove("border", "border-dark", "rounded-2", "p-2");
+                }
+            }
+            count = 0;
+            
+            quantity.textContent = count;
             let temp = 0;
             let arrayCurrent = Array.from({ length: level }, () => Array(level).fill(0));
             let array = [];
-            var emptyIndex = {};
+            let emptyIndex = {};
             for (let i = 1; i < level * level; i++) {
                 array.push(i);
             }
@@ -171,68 +198,85 @@
         }
 
         function moveBlock(arrayCurrent, emptyIndex, level) {
+            document.removeEventListener("keydown", function (event) {
+                move(arrayCurrent, emptyIndex, level, event);
+            });
             document.addEventListener("keydown", function (event) {
-                switch (event.key) {
-                    case "ArrowUp":
-                        if (emptyIndex.row + 1 < level) {
-                            [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row + 1][emptyIndex.column]] =
-                                [arrayCurrent[emptyIndex.row + 1][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column]];
-                            emptyIndex.row++;
-                        }
-                        break;
-                    case "ArrowDown":
-                        if (emptyIndex.row - 1 >= 0) {
-                            [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row - 1][emptyIndex.column]] =
-                                [arrayCurrent[emptyIndex.row - 1][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column]];
-                            emptyIndex.row--;
-                        }
-                        break;
-                    case "ArrowLeft":
-                        if (emptyIndex.column + 1 < level) {
-                            [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column + 1]] =
-                                [arrayCurrent[emptyIndex.row][emptyIndex.column + 1], arrayCurrent[emptyIndex.row][emptyIndex.column]];
-                            emptyIndex.column++;
-                        }
-                        break;
-                    case "ArrowRight":
-                        if (emptyIndex.column - 1 >= 0) {
-                            [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column - 1]] =
-                                [arrayCurrent[emptyIndex.row][emptyIndex.column - 1], arrayCurrent[emptyIndex.row][emptyIndex.column]];
-                            emptyIndex.column--;
-                        }
-                        break;
-                }
-                renderGame(arrayCurrent, level);
-                isWin(arrayCurrent, level);
+                move(arrayCurrent, emptyIndex, level, event);
             });
         }
+        function move(arrayCurrent, emptyIndex, level, event) {
+            switch (event.key) {
+                case "ArrowUp":
+                    if (emptyIndex.row + 1 < level) {
+                        [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row + 1][emptyIndex.column]] =
+                            [arrayCurrent[emptyIndex.row + 1][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                        emptyIndex.row++;
+                        count++;
+                        quantity.textContent = count;
+                    }
+                    break;
+                case "ArrowDown":
+                    if (emptyIndex.row - 1 >= 0) {
+                        [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row - 1][emptyIndex.column]] =
+                            [arrayCurrent[emptyIndex.row - 1][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                        emptyIndex.row--;
+                        count++;
+                        quantity.textContent = count;
+                    }
+                    break;
+                case "ArrowLeft":
+                    if (emptyIndex.column + 1 < level) {
+                        [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column + 1]] =
+                            [arrayCurrent[emptyIndex.row][emptyIndex.column + 1], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                        emptyIndex.column++;
+                        count++;
+                        quantity.textContent = count;
+                    }
+                    break;
+                case "ArrowRight":
+                    if (emptyIndex.column - 1 >= 0) {
+                        [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column - 1]] =
+                            [arrayCurrent[emptyIndex.row][emptyIndex.column - 1], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                        emptyIndex.column--;
+                        count++;
+                        quantity.textContent = count;
+                    }
+                    break;
+            }
+            renderGame(arrayCurrent, level);
+            isWin(arrayCurrent, emptyIndex, level);
+        }
 
-        function isWin(arrayCurrent, level) {
-            temp = 1;
-            flag = true;
-            for (let i = 0; i < level; i++) {
-                for (let j = 0; j < level; j++) {
-                    if (i == j && i == level - 1) continue;
-                    if (arrayCurrent[i][j] != temp) flag=false;
-                    temp++;
+        function isWin(arrayCurrent, emptyIndex, level) {
+            if (mainContent.textContent != "") {
+                temp = 1;
+                flag = true;
+                for (let i = 0; i < level; i++) {
+                    for (let j = 0; j < level; j++) {
+                        if (i == j && i == level - 1) continue;
+                        if (arrayCurrent[i][j] != temp) flag = false;
+                        temp++;
+                    }
+                }
+                if (flag) {
+                    let modal = new bootstrap.Modal(document.getElementById("modalWin"));
+                    modal.show();
+                    var btnAgree = document.getElementById('btnAgree');
+                    var btnDismiss = document.getElementById('btnDismiss');
+
+                    btnAgree.onclick = () => {
+                        arrayCurrent = randomGame(arrayCurrent, emptyIndex, level);
+                        renderGame(arrayCurrent, level);
+                        count = 0;
+                        quantity.textContent = count;
+                        modal.hide();
+                    };
+                    btnDismiss.onclick = () => {
+                        window.location.href = "../index.html";
+                    };
                 }
             }
-            if (flag) {
-                let modal = new bootstrap.Modal(document.getElementById("modalWin"));;
-                modal.show();
-                // var btnAgree = document.getElementById('btnAgree');
-                // var btnDismiss = document.getElementById('btnDismiss');
-
-                // btnAgree.addEventListener('click', () => {
-                //     setGame(document.getElementById('levelSelect').value);
-                //     modal.hide();
-                // });
-                // btnDismiss.addEventListener('click', () => {
-                //     window.location.href = "../index.html";
-                // })
-            }
-
-            
         }
 
         function getRandomInt(min, max) {
