@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puzzle Game</title>
     <link rel="stylesheet" href="vender/css/bootstrap.min.css">
+    <style>
+        .img{
+            width: 300px;
+            height: 300px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar bg-body-tertiary">
@@ -16,8 +22,8 @@
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <div class="card-body">
-                        <img src="image/sliding-puzzle.png" class="img-fluid" style="aspect-ratio: 1/1;">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <img src="image/sliding-puzzle.png" class="img-fluid img" style="aspect-ratio: 1/1;">
                     </div>
                     <div class="card-footer">
                         <a href="page/sliding.html">
@@ -28,8 +34,8 @@
             </div>
             <div class="col">
                 <div class="card">
-                    <div class="card-body">
-                        <img src="image/sudoku.png" class="img-fluid" style="aspect-ratio: 1/1;">   
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <img src="image/sudoku.png" class="img-fluid img" style="aspect-ratio: 1/1;">   
                     </div>
                     <div class="card-footer">
                         <a href="page/sudoku.html">
@@ -40,11 +46,23 @@
             </div>
             <div class="col">
                 <div class="card">
-                    <div class="card-body">
-                        <img src="image/2048.png" class="img-fluid" style="aspect-ratio: 1/1;">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <img src="image/2048.png" class="img-fluid img" style="aspect-ratio: 1/1;">
                     </div>
                     <div class="card-footer">
                         <a href="page/2048.html">
+                            <button type="button" class="btn btn-info">Chơi</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <img src="image/minesweeper.png" class="img-fluid img" style="aspect-ratio: 1/1;">
+                    </div>
+                    <div class="card-footer">
+                        <a href="page/minesweeper.html">
                             <button type="button" class="btn btn-info">Chơi</button>
                         </a>
                     </div>
