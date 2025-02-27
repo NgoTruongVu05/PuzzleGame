@@ -43,18 +43,20 @@
             <div class="col-auto">
                 <select class="form-select" aria-label="Default select example" id="levelSelect"
                     onchange="setGame(levelSelect.value)">
-                    <option selected value="0">Chọn mức độ</option>
                 </select>
             </div>
         </div>
 
 
         <div class="d-flex justify-content-center align-items-center gap-3">
-            <div class="card d-none" id="quantityCard">
+            <div class="card" id="quantityCard">
                 <div class="card-header">Số lần di chuyển</div>
                 <div class="card-body text-center" id="quantity">0</div>
             </div>
-            <div class="main-content">
+            <div class="main-content border border-dark rounded-2 p-1">
+            </div>
+            <div class="btn" style="background-color: #0d6efd;color: white;">
+                Làm mới
             </div>
         </div>
     </div>
@@ -80,11 +82,15 @@
     <script>
         const minOption = 3;
         const maxOption = 7;
+        const defaultLevel = 3;
         let select = document.getElementById("levelSelect");
         for (let i = minOption; i <= maxOption; i++) {
             let option = document.createElement("option");
             option.value = i;
             option.textContent = `${i} x ${i}`;
+            if (i==defaultLevel){
+                option.selected = true;
+            }
             select.appendChild(option);
         }
 
@@ -97,24 +103,10 @@
         var quantity = document.getElementById("quantity");
         var quantityCard = document.getElementById("quantityCard");
 
+        setGame(defaultLevel);
+
         function setGame(level) {
-            if (level >= minOption) {
-                if (quantityCard.classList.contains("d-none")) {
-                    quantityCard.classList.remove("d-none");
-                }
-                if (!mainContent.classList.contains("border")) {
-                    mainContent.classList.add("border", "border-dark", "rounded-2", "p-2");
-                }
-            } else {
-                if (!quantityCard.classList.contains("d-none")) {
-                    quantityCard.classList.add("d-none");
-                }
-                if (mainContent.classList.contains("border")) {
-                    mainContent.classList.remove("border", "border-dark", "rounded-2", "p-2");
-                }
-            }
             count = 0;
-            
             quantity.textContent = count;
             let temp = 0;
             let arrayCurrent = Array.from({ length: level }, () => Array(level).fill(0));
