@@ -7,6 +7,7 @@
     <title>Sudoku</title>
     <style>
         #Sudoku {
+            border-radius: 5px;
             display: grid;
             grid-template-columns: repeat(9, 50px);
             grid-template-rows: repeat(9, 50px);
@@ -28,6 +29,26 @@
             user-select: none;
             justify-content: center;
             align-items: center;
+        }
+
+        .cell2 {
+            border-radius: 5px;
+            margin: 3px;
+            display: flex;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            border: 1px solid black;
+            background-color: white;
+            user-select: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cell:hover,
+        .cell2:hover {
+            background-color: #f0f0f0f1;
         }
 
         .cell:nth-child(3n) {
@@ -88,7 +109,18 @@
             <button class="btn difficulty-btn" data-difficulty="hard">Khó</button>
         </div>
         <div id="Sudoku"></div>
-        <div></div>
+        <div class="d-flex justify-content-center align-items-center"
+            style="background-color: gray;border-radius: 5px;">
+            <div class="cell2">1</div>
+            <div class="cell2">2</div>
+            <div class="cell2">3</div>
+            <div class="cell2">4</div>
+            <div class="cell2">5</div>
+            <div class="cell2">6</div>
+            <div class="cell2">7</div>
+            <div class="cell2">8</div>
+            <div class="cell2">9</div>
+        </div>
         <div class="mt-3">
             <button class="btn btn-primary me-2" onclick="newGame()">Game Mới</button>
             <button class="btn btn-secondary" onclick="solveSudoku()">Giải Sudoku</button>
@@ -97,7 +129,6 @@
     <script>
         const Sudoku = document.getElementById('Sudoku');
         let sudoku = Array(9).fill().map(() => Array(9).fill(0));
-        let board = Array(9).fill().map(() => Array(9).fill(0));
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -108,7 +139,7 @@
 
         let currentDifficulty = 'easy';
         const difficultyLevels = {
-            easy: 35,      // 35 cells to remove
+            easy: 40,      // 35 cells to remove
             medium: 45,    // 45 cells to remove
             hard: 55      // 55 cells to remove
         };
@@ -124,10 +155,8 @@
                                 for (let number of numbers) {
                                     if (isValid(row, col, number)) {
                                         sudoku[row][col] = number;
-                                        board[row][col] = sudoku[row][col];
                                         if (solve()) return true;
                                         sudoku[row][col] = 0;
-                                        board[row][col] = sudoku[row][col];
                                     }
                                 }
                                 return false;
@@ -149,9 +178,6 @@
                 }
             }
         }
-        
-        console.log(sudoku);
-        console.log(board);
         function createBoard() {
             Sudoku.innerHTML = "";
             for (let i = 0; i < 9; i++) {
@@ -182,7 +208,7 @@
             }
             return true;
         }
-        
+
         function solveSudoku() {
             function solve() {
                 for (let row = 0; row < 9; row++) {
@@ -223,9 +249,86 @@
                 newGame();
             });
         });
-
         CreateSudoku();
         createBoard();
+        let selectedCell = null;
+
+        // Bắt sự kiện khi nhấp vào một ô Sudoku
+        Sudoku.addEventListener('click', (event) => {
+            // Xóa highlight trước đó
+            document.querySelectorAll('.highlight').forEach(cell => {
+                cell.classList.remove('highlight');
+                cell.style.backgroundColor = '';
+            });
+
+            if (event.target.classList.contains('cell')) {
+                if (selectedCell) {
+                    selectedCell.classList.remove('selected');
+                    selectedCell.style.backgroundColor = '';
+                }
+                selectedCell = event.target;
+                selectedCell.classList.add('selected');
+
+                let selectedValue = selectedCell.innerHTML;
+
+                if (selectedValue === "") {
+                    // Nếu ô trống, chỉ tô màu nền của ô được chọn
+                    selectedCell.style.backgroundColor = '#dcdcdc';
+                } else {
+                    let affectedCells = [];
+
+                    // Tìm tất cả các ô có cùng giá trị
+                    document.querySelectorAll('.cell').forEach(cell => {
+                        if (cell.innerHTML === selectedValue) {
+                            affectedCells.push(cell);
+                        }
+                    });
+                    // Tô màu tất cả ô có cùng giá trị và ô trong hàng, cột của chúng
+                    affectedCells.forEach(cell => {
+                        let row = cell.dataset.row;
+                        let col = cell.dataset.col;
+
+                        document.querySelectorAll('.cell').forEach(otherCell => {
+                            if (otherCell.dataset.row == row || otherCell.dataset.col == col) {
+                                affectedCells.push(otherCell);
+                            }
+                        });
+                    });
+
+                    // Áp dụng highlight cho tất cả các ô bị ảnh hưởng
+                    affectedCells.forEach(cell => {
+                        cell.classList.add('highlight');
+                        cell.style.backgroundColor = '#dcdcdc'; // Màu vàng nhạt
+                    });
+                }
+            }
+        });
+
+        function checkWin(){
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (sudoku[i][j] == 0) return false;
+                }
+            }
+            return true;
+        }
+
+        // Bắt sự kiện khi nhấp vào một số trong danh sách phía dưới
+        document.querySelectorAll('.cell2').forEach(numberCell => {
+            numberCell.addEventListener('click', () => {
+                if (selectedCell && selectedCell.innerHTML === "" && isValid(selectedCell.dataset.row, selectedCell.dataset.col, numberCell.innerText)) {
+                    selectedCell.innerHTML = numberCell.innerText;
+                    selectedCell.style.backgroundColor = '#d2f4d2';
+                }
+                else {
+                    selectedCell.style.backgroundColor = '#ffd2d2';
+                }
+                if (checkWin()) {
+                    alert("Chúc mừng! Bạn đã giải xong Sudoku!");
+                }
+            });
+        });
+
     </script>
 
     <script src="../vender/js/bootstrap.bundle.min.js"></script>
