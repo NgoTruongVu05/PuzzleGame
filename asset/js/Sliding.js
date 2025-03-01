@@ -1,6 +1,7 @@
 const minOption = 3;
 const maxOption = 7;
 const defaultLevel = 3;
+var handleKeydown = null;
 let select = document.getElementById("levelSelect");
 for (let i = minOption; i <= maxOption; i++) {
     let option = document.createElement("option");
@@ -21,13 +22,12 @@ var count = 0;
 var quantity = document.getElementById("quantity");
 var quantityCard = document.getElementById("quantityCard");
 
-setGame(defaultLevel);
 
 function setGame(level) {
     count = 0;
     quantity.textContent = count;
     let temp = 0;
-    let arrayCurrent = Array.from({ length: level }, () => Array(level).fill(0));
+    let currentArray = Array.from({ length: level }, () => Array(level).fill(0));
     let array = [];
     let emptyIndex = {};
     for (let i = 1; i < level * level; i++) {
@@ -36,70 +36,70 @@ function setGame(level) {
     array.push(0);
     for (let i = 0; i < level; i++) {
         for (let j = 0; j < level; j++) {
-            arrayCurrent[i][j] = array[temp];
+            currentArray[i][j] = array[temp];
             temp++;
-            if (arrayCurrent[i][j] == 0) {
+            if (currentArray[i][j] == 0) {
                 emptyIndex.row = i;
                 emptyIndex.column = j;
             }
         }
     }
-    arrayCurrent = randomGame(arrayCurrent, emptyIndex, level);
-    renderGame(arrayCurrent, level);
-    moveBlock(arrayCurrent, emptyIndex, level);
+    currentArray = randomGame(currentArray, emptyIndex, level);
+    renderGame(currentArray, level);
+    moveBlock(currentArray, emptyIndex, level);
 }
 
-function randomGame(arrayCurrent, emptyIndex, level) {
+function randomGame(currentArray, emptyIndex, level) {
     const MAX = 1000;
     for (let i = 0; i < MAX; i++) {
         let randomInt = getRandomInt(1, 4);
         switch (randomInt) {
             case 1:
                 if (emptyIndex.row + 1 < level) {
-                    [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row + 1][emptyIndex.column]] =
-                        [arrayCurrent[emptyIndex.row + 1][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                    [currentArray[emptyIndex.row][emptyIndex.column], currentArray[emptyIndex.row + 1][emptyIndex.column]] =
+                        [currentArray[emptyIndex.row + 1][emptyIndex.column], currentArray[emptyIndex.row][emptyIndex.column]];
                     emptyIndex.row++;
                 }
                 break;
             case 2:
                 if (emptyIndex.row - 1 >= 0) {
-                    [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row - 1][emptyIndex.column]] =
-                        [arrayCurrent[emptyIndex.row - 1][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                    [currentArray[emptyIndex.row][emptyIndex.column], currentArray[emptyIndex.row - 1][emptyIndex.column]] =
+                        [currentArray[emptyIndex.row - 1][emptyIndex.column], currentArray[emptyIndex.row][emptyIndex.column]];
                     emptyIndex.row--;
                 }
                 break;
             case 3:
                 if (emptyIndex.column + 1 < level) {
-                    [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column + 1]] =
-                        [arrayCurrent[emptyIndex.row][emptyIndex.column + 1], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                    [currentArray[emptyIndex.row][emptyIndex.column], currentArray[emptyIndex.row][emptyIndex.column + 1]] =
+                        [currentArray[emptyIndex.row][emptyIndex.column + 1], currentArray[emptyIndex.row][emptyIndex.column]];
                     emptyIndex.column++;
                 }
                 break;
             case 4:
                 if (emptyIndex.column - 1 >= 0) {
-                    [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column - 1]] =
-                        [arrayCurrent[emptyIndex.row][emptyIndex.column - 1], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                    [currentArray[emptyIndex.row][emptyIndex.column], currentArray[emptyIndex.row][emptyIndex.column - 1]] =
+                        [currentArray[emptyIndex.row][emptyIndex.column - 1], currentArray[emptyIndex.row][emptyIndex.column]];
                     emptyIndex.column--;
                 }
                 break;
         }
     }
-    return arrayCurrent;
+    return currentArray;
 }
 
-function renderGame(arrayCurrent, level) {
+function renderGame(currentArray, level) {
     mainContent.innerHTML = '';
     for (let i = 0; i < level; i++) {
         for (let j = 0; j < level; j++) {
-            if (arrayCurrent[i][j] == 0) {
+            if (currentArray[i][j] == 0) {
                 let child = document.createElement("div");
                 child.className = "block non m-1 align-content-center border border-dark rounded-2 bg-info";
-                child.textContent = `${arrayCurrent[i][j]}`;
+                child.textContent = `${currentArray[i][j]}`;
                 mainContent.appendChild(child);
             } else {
                 let child = document.createElement("div");
                 child.className = "block m-1 align-content-center border border-dark rounded-2 bg-info";
-                child.textContent = `${arrayCurrent[i][j]}`;
+                child.textContent = `${currentArray[i][j]}`;
                 mainContent.appendChild(child);
             }
         }
@@ -107,20 +107,25 @@ function renderGame(arrayCurrent, level) {
     }
 }
 
-function moveBlock(arrayCurrent, emptyIndex, level) {
-    document.removeEventListener("keydown", function (event) {
-        move(arrayCurrent, emptyIndex, level, event);
-    });
-    document.addEventListener("keydown", function (event) {
-        move(arrayCurrent, emptyIndex, level, event);
-    });
+
+function moveBlock(currentArray, emptyIndex, level) {
+    if (handleKeydown) {
+        document.removeEventListener("keydown", handleKeydown);
+    }
+
+    handleKeydown = function (event) {
+        move(currentArray, emptyIndex, level, event);
+    };
+    document.addEventListener("keydown", handleKeydown);
 }
-function move(arrayCurrent, emptyIndex, level, event) {
+
+
+function move(currentArray, emptyIndex, level, event) {
     switch (event.key) {
         case "ArrowUp":
             if (emptyIndex.row + 1 < level) {
-                [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row + 1][emptyIndex.column]] =
-                    [arrayCurrent[emptyIndex.row + 1][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                [currentArray[emptyIndex.row][emptyIndex.column], currentArray[emptyIndex.row + 1][emptyIndex.column]] =
+                    [currentArray[emptyIndex.row + 1][emptyIndex.column], currentArray[emptyIndex.row][emptyIndex.column]];
                 emptyIndex.row++;
                 count++;
                 quantity.textContent = count;
@@ -128,8 +133,8 @@ function move(arrayCurrent, emptyIndex, level, event) {
             break;
         case "ArrowDown":
             if (emptyIndex.row - 1 >= 0) {
-                [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row - 1][emptyIndex.column]] =
-                    [arrayCurrent[emptyIndex.row - 1][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                [currentArray[emptyIndex.row][emptyIndex.column], currentArray[emptyIndex.row - 1][emptyIndex.column]] =
+                    [currentArray[emptyIndex.row - 1][emptyIndex.column], currentArray[emptyIndex.row][emptyIndex.column]];
                 emptyIndex.row--;
                 count++;
                 quantity.textContent = count;
@@ -137,8 +142,8 @@ function move(arrayCurrent, emptyIndex, level, event) {
             break;
         case "ArrowLeft":
             if (emptyIndex.column + 1 < level) {
-                [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column + 1]] =
-                    [arrayCurrent[emptyIndex.row][emptyIndex.column + 1], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                [currentArray[emptyIndex.row][emptyIndex.column], currentArray[emptyIndex.row][emptyIndex.column + 1]] =
+                    [currentArray[emptyIndex.row][emptyIndex.column + 1], currentArray[emptyIndex.row][emptyIndex.column]];
                 emptyIndex.column++;
                 count++;
                 quantity.textContent = count;
@@ -146,27 +151,30 @@ function move(arrayCurrent, emptyIndex, level, event) {
             break;
         case "ArrowRight":
             if (emptyIndex.column - 1 >= 0) {
-                [arrayCurrent[emptyIndex.row][emptyIndex.column], arrayCurrent[emptyIndex.row][emptyIndex.column - 1]] =
-                    [arrayCurrent[emptyIndex.row][emptyIndex.column - 1], arrayCurrent[emptyIndex.row][emptyIndex.column]];
+                [currentArray[emptyIndex.row][emptyIndex.column], currentArray[emptyIndex.row][emptyIndex.column - 1]] =
+                    [currentArray[emptyIndex.row][emptyIndex.column - 1], currentArray[emptyIndex.row][emptyIndex.column]];
                 emptyIndex.column--;
                 count++;
                 quantity.textContent = count;
             }
             break;
     }
-    renderGame(arrayCurrent, level);
-    isWin(arrayCurrent, emptyIndex, level);
+    renderGame(currentArray, level);
+    isWin(currentArray, emptyIndex, level);
 }
 
-function isWin(arrayCurrent, emptyIndex, level) {
+function isWin(currentArray, emptyIndex, level) {
     if (mainContent.textContent != "") {
         temp = 1;
         flag = true;
         for (let i = 0; i < level; i++) {
             for (let j = 0; j < level; j++) {
-                if (i == j && i == level - 1) continue;
-                if (arrayCurrent[i][j] != temp) flag = false;
-                temp++;
+                if (i === level - 1 && j === level - 1) {
+                    if (currentArray[i][j] !== 0) flag = false;
+                } else {
+                    if (currentArray[i][j] !== temp) flag = false;
+                    temp++;
+                }
             }
         }
         if (flag) {
@@ -176,8 +184,8 @@ function isWin(arrayCurrent, emptyIndex, level) {
             var btnDismiss = document.getElementById('btnDismiss');
 
             btnAgree.onclick = () => {
-                arrayCurrent = randomGame(arrayCurrent, emptyIndex, level);
-                renderGame(arrayCurrent, level);
+                currentArray = randomGame(currentArray, emptyIndex, level);
+                renderGame(currentArray, level);
                 count = 0;
                 quantity.textContent = count;
                 modal.hide();
@@ -192,3 +200,5 @@ function isWin(arrayCurrent, emptyIndex, level) {
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+setGame(defaultLevel);

@@ -6,6 +6,33 @@
     <title>Minesweeper</title>
     <link rel="stylesheet" href="../vender/css/bootstrap.min.css">
     <link rel="stylesheet" href="../vender/css/fontawesome-free/css/all.min.css">
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            padding: 5px;
+            background-color: #f0f0f0;
+        }
+        .block {
+            display: inline-block;
+            width: 1.5em;
+            aspect-ratio: 1 / 1;
+            border: 1px solid black;
+            text-align: center;
+            border-radius: 2px;
+            background-color: slategray;
+        }
+
+        .block.clicked{
+            background-color: white;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar bg-body-tertiary">
@@ -13,11 +40,46 @@
             <a href="../index.html" class="navbar-brand border border-dark rounded-2 p-2 mb-2">Menu Game Puzzle</a>
         </div>
     </nav>
-    <a href="../index.html" class="text-dark fs-1" style="text-decoration: none;">
-        <i class="fas fa-home"></i>
-        <span class="fs-5">Trở về trang chủ</span>
-    </a>
+    <div class="container-fluid p-0">
+        <div class="container">
+            <a href="../index.html" class="text-dark fs-1" style="text-decoration: none;">
+                <i class="fas fa-home"></i>
+                <span class="fs-5">Trở về trang chủ</span>
+            </a>
+        </div>
 
+        <div class="row row-cols-2 d-flex justify-content-center align-items-center m-4">
+            <div class="col-auto">
+                <button class="btn btn-light border border-dark rounded-2" id="easyLevel" onclick="setGame(this.id)">Dễ</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-light border border-dark rounded-2" id="mediumLevel" onclick="setGame(this.id)">Trung bình</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-light border border-dark rounded-2" id="hardLevel" onclick="setGame(this.id)">Khó</button>
+            </div>
+        </div>
+
+
+        <div class="d-flex flex-lg-row flex-column-reverse justify-content-center align-items-center gap-3">
+            <div class="card" id="quantityCard">
+                <div class="card-header">Số lượng cờ</div>
+                <div class="card-body text-center" id="quantity">0</div>
+            </div>
+            <div class="main-content bg-white border border-dark rounded-2">
+            </div>
+            <div class="d-flex flex-column gap-3">
+                <div class="btn" style="background-color: #0d6efd;color: white;" onclick="resetGame()">
+                    Chơi lại
+                </div>
+                <div class="btn" style="background-color: #0d6efd;color: white;" onclick="renderGame()">
+                    Trận mới
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../asset/js/minesweeper.js"></script>
     <script src="../vender/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
