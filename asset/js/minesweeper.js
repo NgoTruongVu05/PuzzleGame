@@ -45,7 +45,11 @@ function renderGame(currentArray, isLoad) {
             if (firstClickedBlock != null && firstClickedBlock.dataset.x == i && firstClickedBlock.dataset.y == j) {
                 child.classList.add('clicked');
             }
-            child.innerHTML = `<span>${currentArray[i][j]}</span>`;
+            if (currentArray[i][j] == 0){
+                child.innerHTML = `<span style="visibility: hidden">${currentArray[i][j]}</span>`;
+            } else{
+                child.innerHTML = `<span>${currentArray[i][j]}</span>`;
+            }
             mainContent.appendChild(child);
             if (isLoad) child.addEventListener('click', handleClickBlock)
         }
@@ -59,8 +63,6 @@ function renderGame(currentArray, isLoad) {
             });
         }
         lastBlocks = blocks;
-    } else{
-
     }
 
     quantityBlock.innerHTML = currentLevel.mine;
