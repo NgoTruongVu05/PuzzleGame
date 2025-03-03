@@ -91,7 +91,6 @@ function createArray(row, col, mine) {
             }
         }
     }
-    console.log(newArray)
     return newArray;
 }
 
@@ -121,26 +120,35 @@ function handleClickBlock(e) {
                 loadGame();
             }
         }
-        // if (block.textContent == 0) {
-        //     aroundBlock(block);
-        // }
+        if (block.textContent == 0) {
+            aroundBlock(block);
+        }
     }
 }
 
-// function aroundBlock(currentArray,block) {
-//     let blockArray1D = mainContent.children;
-//     for (let i = -1; i <= 1; i++) {
-//         for (let j = -1; j <= 1; j++) {
-//             if (i === 0 && j === 0) continue;
-//             if (array[x + i] && array[x + i][y + j] !== -1) {
-//                 if (array[x + i][y + j] === 0) {
-//                     aroundBlock(block);
-//                 }
-//                 blockArray1D[(x + i) * currentLevel.col + y + j].classList.add('clicked');
-//             }
-//         }
-//     }
-// }
+function aroundBlock(block) {
+    let blockArray1D = mainContent.children;
+    let x = parseInt(block.dataset.x);
+    let y = parseInt(block.dataset.y);
+
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            if (i === 0 && j === 0) continue;
+            let newX = x + i;
+            let newY = y + j;
+            if (newX >= 0 && newX < currentLevel.row && newY >= 0 && newY < currentLevel.col) {
+                let tempBlock = blockArray1D[newX * currentLevel.col + newY];
+                if (tempBlock && !tempBlock.classList.contains('clicked')) {
+                    tempBlock.classList.add('clicked');
+                    if (tempBlock.textContent == '0') {
+                        aroundBlock(tempBlock);
+                        console.log(tempBlock);
+                    }
+                }
+            }
+        }
+    }
+}
 
 function resetGame() {
     let blocks = document.querySelectorAll('.block');
