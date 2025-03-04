@@ -13,10 +13,12 @@ const mainContent = document.querySelector('.main-content');
 let currentId = 'easyLevel';
 let currentLevel = level.easyLevel;
 let currentSelector = document.getElementById(currentId);
-let quantityBlock = document.getElementById('quantity');
+let quantityMineBlock = document.getElementById('quantity');
 let firstClickedBlock = null;
 let currentArray;
 let lastBlocks = null; // Thì quá khứ ...
+let quantityMine = null;
+let arrayMine = [];
 
 function setGame(id) {
     if (firstClickedBlock) firstClickedBlock = null;
@@ -26,15 +28,18 @@ function setGame(id) {
     currentSelector = selector;
     currentId = id;
     currentLevel = level[id];
-    currentArray = new Array(currentLevel.row).fill(0).map(() => new Array(currentLevel.col).fill(0))
+    currentArray = new Array(currentLevel.row).fill(0).map(() => new Array(currentLevel.col).fill(0));
+    quantityMine = currentLevel.mine;
 
     renderGame(currentArray,true);
 }
 
-function renderGame(currentArray, isLoad) {
+function renderGame(currentArray, isLoad = null) {
     mainContent.innerHTML = '';
-    mainContent.style.gridTemplateColumns = `repeat(${currentLevel.col}, 1fr)`;
-    mainContent.style.gridTemplateRows = `repeat(${currentLevel.row}, 1fr)`;
+    if (isLoad){
+        mainContent.style.gridTemplateColumns = `repeat(${currentLevel.col}, 1fr)`;
+        mainContent.style.gridTemplateRows = `repeat(${currentLevel.row}, 1fr)`;
+    }
 
     for (let i = 0; i < currentLevel.row; i++) {
         for (let j = 0; j < currentLevel.col; j++) {
@@ -45,13 +50,17 @@ function renderGame(currentArray, isLoad) {
             if (firstClickedBlock != null && firstClickedBlock.dataset.x == i && firstClickedBlock.dataset.y == j) {
                 child.classList.add('clicked');
             }
-            if (currentArray[i][j] == 0){
-                child.innerHTML = `<span style="visibility: hidden">${currentArray[i][j]}</span>`;
+            if (currentArray[i][j] == -1){
+                child.innerHTML = `<span><i class="fas fa-bomb"></i></span>`;
+                arrayMine.push(child);
             } else{
                 child.innerHTML = `<span>${currentArray[i][j]}</span>`;
             }
             mainContent.appendChild(child);
-            if (isLoad) child.addEventListener('click', handleClickBlock)
+            if (isLoad){
+                child.addEventListener('click', handleClickBlock);
+                child.addEventListener('contextmenu', handleRightClickBlock);
+            }
         }
     }
 
@@ -60,12 +69,13 @@ function renderGame(currentArray, isLoad) {
         if (lastBlocks != null) {
             lastBlocks.forEach(block => {
                 block.removeEventListener('click', handleClickBlock);
+                block.removeEventListener('contextmenu', handleRightClickBlock);
             });
         }
         lastBlocks = blocks;
     }
 
-    quantityBlock.innerHTML = currentLevel.mine;
+    quantityMineBlock.innerHTML = quantityMine;
 }
 
 function loadGame() {
@@ -89,14 +99,14 @@ function createArray(row, col, mine) {
     for (let i = 0; i < row; i++) {
         for (let j = 0; j < col; j++) {
             if (newArray[i][j] === 0) {
-                newArray[i][j] = quantityMinesAround(newArray, i, j);
+                newArray[i][j] = quantityMineBlocksAround(newArray, i, j);
             }
         }
     }
     return newArray;
 }
 
-function quantityMinesAround(array, x, y) {
+function quantityMineBlocksAround(array, x, y) {
     let mines = 0;
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
@@ -109,22 +119,60 @@ function quantityMinesAround(array, x, y) {
     return mines;
 }
 
+function handleRightClickBlock(e){
+    e.preventDefault();
+    block = e.currentTarget;
+    value = currentArray[parseInt(block.dataset.x)][parseInt(block.dataset.y)];
+    if (block.classList.contains('clicked')) return;
+    if (!block.classList.contains('flag')){
+        block.classList.add('flag');
+        block.classList.add('appear');
+        block.innerHTML = `<span><i class="fas fa-flag" style="color: red"></i></span>`;
+        quantityMine--;
+        quantityMineBlock.innerHTML = quantityMine;
+    } else{
+        block.classList.remove('flag');
+        block.classList.remove('appear');
+        block.innerHTML = `<span>${value}</span>`;
+        quantityMine++;
+        quantityMineBlock.innerHTML = quantityMine;
+    }
+    if (isWin()) {
+        setTimeout(() => {
+            alert('Thắng rồi! Bạn thắng là nhờ thằng code game hay đấy bro!!!');
+            newGame();
+        }, 200);
+    }
+}
+
 function handleClickBlock(e) {
     block = e.currentTarget;
-    if (block.textContent == -1) {
-        alert('Thua rồi');
-        newGame();
+    tempValue = currentArray[parseInt(block.dataset.x)][parseInt(block.dataset.y)];
+    if (tempValue == -1) {
+        setTimeout(() => {
+            alert('Thua rồi');
+            newGame();
+        },200);
     } else {
         if (!block.classList.contains('clicked')) {
             block.classList.add('clicked');
+            if (tempValue != 0){
+                block.classList.add('appear');
+            }
             if (firstClickedBlock === null) {
                 firstClickedBlock = block;
                 loadGame();
             }
         }
-        if (block.textContent == 0) {
+        if (tempValue == 0) {
             aroundBlock(block);
         }
+    }
+    if (isWin()) {
+        setTimeout(() => {
+            alert('Thắng rồi! Bạn thắng là nhờ thằng code game hay đấy bro!!!');
+            newGame();
+        }, 200);
     }
 }
 
@@ -140,16 +188,31 @@ function aroundBlock(block) {
             let newY = y + j;
             if (newX >= 0 && newX < currentLevel.row && newY >= 0 && newY < currentLevel.col) {
                 let tempBlock = blockArray1D[newX * currentLevel.col + newY];
+                let tempValue = currentArray[newX][newY];
                 if (tempBlock && !tempBlock.classList.contains('clicked')) {
-                    tempBlock.classList.add('clicked');
-                    if (tempBlock.textContent == '0') {
+                    if (tempValue != '-1'){
+                        tempBlock.classList.add('clicked');
+                        if (tempValue != 0){
+                            tempBlock.classList.add('appear');
+                        }
+                    }
+                    if (tempValue == '0') {
                         aroundBlock(tempBlock);
-                        console.log(tempBlock);
                     }
                 }
             }
         }
     }
+}
+function isWin(){
+    let tempEmploy = 0;
+    let tempFlag = 0;
+    let blockArray1D = mainContent.children;
+    for (let i = 0; i < blockArray1D.length; i++){
+        if (blockArray1D[i].classList.contains('clicked')) tempEmploy++;
+        if (blockArray1D[i].classList.contains('flag')) tempFlag++;
+    }
+    return (tempEmploy+tempFlag) == (currentLevel.row*currentLevel.col);
 }
 
 function resetGame() {
@@ -158,6 +221,7 @@ function resetGame() {
         block.classList.remove('clicked');
     });
 }
+
 
 function newGame() {
     setGame(currentId);
