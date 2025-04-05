@@ -163,6 +163,43 @@ function move(currentArray, emptyIndex, level, event) {
     isWin(currentArray, emptyIndex, level);
 }
 
+function moveMobile(currentArray, emptyIndex, level) {
+    let touchstartX = 0;
+    let touchstartY = 0;
+    let touchendX = 0;
+    let touchendY = 0;
+
+    mainContent.addEventListener("touchstart", (event) => {
+        touchstartX = event.changedTouches[0].screenX;
+        touchstartY = event.changedTouches[0].screenY;
+    });
+
+    mainContent.addEventListener("touchend", (event) => {
+        touchendX = event.changedTouches[0].screenX;
+        touchendY = event.changedTouches[0].screenY;
+        handleGesture(currentArray, emptyIndex, level);
+    });
+
+    function handleGesture(currentArray, emptyIndex, level) {
+        const xDiff = touchendX - touchstartX;
+        const yDiff = touchendY - touchstartY;
+
+        if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            if (xDiff > 0) {
+                move(currentArray, emptyIndex, level, { key: "ArrowRight" });
+            } else {
+                move(currentArray, emptyIndex, level, { key: "ArrowLeft" });
+            }
+        } else {
+            if (yDiff > 0) {
+                move(currentArray, emptyIndex, level, { key: "ArrowDown" });
+            } else {
+                move(currentArray, emptyIndex, level, { key: "ArrowUp" });
+            }
+        }
+    }
+}
+
 function isWin(currentArray, emptyIndex, level) {
     if (mainContent.textContent != "") {
         temp = 1;
