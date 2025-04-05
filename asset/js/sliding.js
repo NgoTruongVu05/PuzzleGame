@@ -47,6 +47,7 @@ function setGame(level) {
     currentArray = randomGame(currentArray, emptyIndex, level);
     renderGame(currentArray, level);
     moveBlock(currentArray, emptyIndex, level);
+    moveMobile(currentArray, emptyIndex, level);
 }
 
 function randomGame(currentArray, emptyIndex, level) {
